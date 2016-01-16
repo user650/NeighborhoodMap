@@ -9,6 +9,11 @@
   z-index: 110;
   text-align: center;
 }
+#label {
+  color: white;
+}
+
+
 html, body {
   height: 100%;
   margin: 0;
@@ -32,12 +37,13 @@ html, body {
   margin-top: 12px;
 }
 
-#markerList {
+.list{
   font-size: 18px;
   color: #EEF7FF;
   text-align: left;
   padding-left: 20px;
 }
+
 #map {
   width: 100%;
   height: 300%;
@@ -61,6 +67,7 @@ main {
   width: 100%;
   height: 100%;
 }
+
 .hamburger {
   font-size: 38px;
   color: #4a8ffb;

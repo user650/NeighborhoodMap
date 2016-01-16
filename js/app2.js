@@ -33,6 +33,12 @@ var Model = {
 		latLng: {lat: 34.177871, lng: -84.030111},
 		address: '7000 LANIER ISLANDS PARKWAY BUFORD, GA 30518',
 		url: 'http://www.lanierislands.com/'
+	},
+	{
+		title: 'The Georgia Dome',
+		latLng: {lat: 33.757694, lng: -84.400625},
+		address: '1 Georgia Dome Dr, Atlanta, GA 30313',
+		url: 'http://www.gadome.com/'
 	}
   ],
   miltonCenter: {lat: 33.931375, lng: -84.381658}
@@ -41,9 +47,9 @@ var Model = {
 var ViewModel = function () {
 	var self = this;
 	var map;
-	self.searchString = "Coca Cola Factory";
+	this.searchString = ".Coca Cola Factory";
 
-	//populate the markerList with google markers using the data from the Model.markers
+	//populate the markerList with google markers using the data from the Model.miltonMarker
 	console.log("loading the observable array with google markers");
 	markerList = ko.observableArray([]);
     Model.miltonMarker.forEach(function(markerItem){
@@ -86,9 +92,10 @@ var ViewModel = function () {
 			});
 			clickedMarker.setAnimation(google.maps.Animation.BOUNCE);
   		}
-
+  		else {
+  			clickedMarker.setAnimation(google.maps.Animation.NULL);
+  		}
   	}
-	
 };
 
 ko.applyBindings(new ViewModel());
