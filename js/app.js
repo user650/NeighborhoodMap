@@ -47,7 +47,12 @@ var Model = {
 var ViewModel = function () {
 	var self = this;
 	var map;
-	this.searchString = ko.observable("Coca Cola Factory");
+	
+	this.processFilter = function(){
+		console.log ('running the proessFilter');
+	};
+
+	this.searchString = ko.observable("");
 
 	//populate the markerList with google markers using the data from the Model.miltonMarker
 	console.log("loading the observable array with google markers");

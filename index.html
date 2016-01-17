@@ -11,19 +11,21 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDnMDCU1lhdz0OgwyTipn9-euoPe9aOiEY"></script>
   </head>
   <body>
-    <div id="container">
         <div id="header"><img src="img/milton.jpg" alt="Milton, GA" class="logo">
             <h1>Milton, Georgia<br>Neighborhood Area Guide</h1>
             <div id="nav-bar" class="list">
-            <span><label>Search : <input data-bind="textInput: searchString"/></label></span>
-                <ul id="markerList" data-bind="foreach: markerList">
-                    <div data-bind="if: title == $parent.searchString() || $parent.searchString() == ''">
-                        <li data-bind="text: title, click: $parent.toggleBounce"></li>
-                    </div>
-                </ul>
+            
+            <form data-bind="submit: processFilter">
+                <input type="text" placeholder="enter location to filter" data-bind="value: searchString, selectOnFocus: true">
+                <input type="submit" value="Search">
+            </form>
+            <ul id="markerList" data-bind="foreach: markerList">
+                <div data-bind="if: title == $parent.searchString() || $parent.searchString() == ''">
+                    <li data-bind="text: title, click: $parent.toggleBounce"></li>
+                </div>
+            </ul>
             </div>
             <div id="map"></div>
-    </div>       
     <script src="js/libs/knockout-3.4.0.js"></script>
 
     <!-- API call for google map using the map coordinates in the app.js -->
