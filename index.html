@@ -17,7 +17,7 @@
             <div id="nav-bar" class="list">
             <span><label>Search : <input data-bind="textInput: searchString"/></label></span>
                 <ul id="markerList" data-bind="foreach: markerList">
-                    <div data-bind="if: ($parent.searchString() == '' or (title == $parent.searchString())">
+                    <div data-bind="if: title == $parent.searchString() || $parent.searchString() == ''">
                         <li data-bind="text: title, click: $parent.toggleBounce"></li>
                     </div>
                 </ul>
