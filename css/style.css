@@ -19,15 +19,15 @@ html, body {
 }
 #nav-bar {
   position: fixed;
-  display:block;
+  display: block;
   width: 274px;
   height: 100%;
   top: 180px;
   left: 0px;
   background-color: #58453E;
   z-index: 100;
-  backface-visibility: hidden;/* Add to improve animations with GPU acceleration - as per Udacity Reviewer */
-    will-change: transform;/* Add to allow browser to determine if it should create a new layers */
+  backface-visibility: hidden; /* for performance */
+    will-change: transform;    /* allows browser to determine need to layers */
 }
 
 #searchBar {
