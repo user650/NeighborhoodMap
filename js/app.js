@@ -61,16 +61,27 @@ var ViewModel = function () {
 		console.log('bob = ' + bob);
 		console.log ('searchString = ' + self.searchString());
 		markerList().forEach(function(markerItem){
-			console.log (markerItem.title + ' =? ' + self.searchString());
-			if (markerItem.title == self.searchString()) {
+
+			/* taken from sample http://opensoul.org/2011/06/23/live-search-with-knockoutjs/
+			if(beers[x].name.toLowerCase().indexOf(value.toLowerCase()) >= 0) {
+        		viewModel.beers.push(beers[x]);
+        	} */
+
+			if (self.searchString() == '' || markerItem.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
 				markerItem.setVisible(true);
-				console.log('bingo');
-				console.log(markerItem);
+				console.log('Match : ' + markerItem.title);
 			} else {
 				markerItem.setVisible(false);
-				console.log('nada');
 			}
 		});
+	
+		/* after all of the flags have been updated then trigger a change 
+		   to the markerList so that it will display */
+		var tempList = ko.observableArray(markerList());
+		markerList([]);
+		for (var x=0; x < tempList().length; x++){
+		    markerList.push(tempList()[x]);
+		};
 	};
 
 	//populate the original markerList with google markers using the data from the Model.miltonMarker
