@@ -2,6 +2,8 @@
    Scott Stubbs December 2015 
    use Milton, GA / North Atlanta as the center of the map */
 
+var $wikiElem = $('#wikipedia-links');
+
 var Model = {
   miltonMarker: [
     {
@@ -130,7 +132,6 @@ var ViewModel = function () {
 	   	marker.addListener('click', function() {
 			self.toggleBounce(marker);
   		});
-	   	console.log(marker);
         markerList.push(marker);  // push all of the google marker objects to the markerList arrary
     });
 
@@ -159,7 +160,10 @@ var ViewModel = function () {
 			//bounce the icon
 			clickedMarker.setAnimation(google.maps.Animation.BOUNCE);
 
-			//set the content of the infowindow
+			//load the wikipedia inforamtion
+			self.getWiki(clickedMarker);
+		 	
+		 	// load the infoWindow
 		 	var contentString = '<h3>' + clickedMarker.title + '</h3>' + clickedMarker.address + '<br>' + '<a href="' + clickedMarker.url + '">' + clickedMarker.url + '</a>';
 		  	var infowindow = new google.maps.InfoWindow({
 		    	content: contentString
@@ -170,6 +174,36 @@ var ViewModel = function () {
   			/* if the current marker is bouncing then keep the infoWindow displayed, but stop the bouncing of the icon */
   			clickedMarker.setAnimation(google.maps.Animation.NULL);
  		}
+  	};
+
+  	this.getWiki = function (clickedMarker){
+  		console.log('calling the getWiki function');
+	    // load wikipedia data
+	    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + clickedMarker.address + '&format=json&callback=wikiCallback';
+	    var wikiRequestTimeout = setTimeout(function(){
+	        $wikiElem.text("failed to get wikipedia resources");
+	        console.log('reached the failed message');
+	    }, 8000);
+
+	    $.ajax({
+	        url: wikiUrl,
+	        dataType: "jsonp",
+	        jsonp: "callback",
+	        success: function( response ) {
+	            var articleList = response[1];
+	            console.log('in the response function');
+	            console.log('reponse = ' + response);
+	            console.log('articleList = ' + articleList);
+	            for (var i = 0; i < articleList.length; i++) {
+	                articleStr = articleList[i];
+	                var url = 'http://en.wikipedia.org/wiki/' + articleStr;
+			        console.log('url found:' + url);
+	                $wikiElem.append('<li><a href="' + url + '">' + articleStr + '</a></li>');
+	            };
+
+	            clearTimeout(wikiRequestTimeout);
+	        }
+	    });
   	}
 
 };
