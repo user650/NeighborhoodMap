@@ -179,7 +179,8 @@ var ViewModel = function () {
   	this.getWiki = function (clickedMarker){
   		console.log('calling the getWiki function');
 	    // load wikipedia data
-	    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + clickedMarker.address + '&format=json&callback=wikiCallback';
+	    //todo replace the Alpharetta with a city from the clickedMarker.address
+	    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=Alpharetta&format=json&callback=wikiCallback';
 	    var wikiRequestTimeout = setTimeout(function(){
 	        $wikiElem.text("failed to get wikipedia resources");
 	        console.log('reached the failed message');
