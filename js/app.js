@@ -15,7 +15,7 @@ var Model = {
 		visible: false
 	},
 	{
-		title:	'Turner Field - Home of the Braves',
+		title:	'Turner Field',
 		latLng: {lat: 33.735067, lng: -84.38999433}, 
 		address: '755 Hank Aaron Dr SE<br>Atlanta, GA 30315',
 		url: 'http://atlanta.braves.mlb.com/atl/ballpark/',
@@ -23,7 +23,7 @@ var Model = {
 		visible: true
 	},
 	{
-		title:	'Georgia Aquarium!',
+		title:	'Georgia Aquarium',
 		latLng: {lat: 33.763627, lng: -84.395121},
 		address: '225 Baker St NW<br>Atlanta, GA 30313',
 		url: 'http://www.georgiaaquarium.org/',
@@ -43,7 +43,7 @@ var Model = {
 		latLng: {lat: 34.177871, lng: -84.030111},
 		address: '7000 LANIER ISLANDS PARKWAY<br>BUFORD, GA 30518',
 		url: 'http://www.lanierislands.com/',
-		iconImage: 'img/waterski.png',
+		iconImage: 'img/waterski.jpg',
 		visible: true
 	},
 	{
@@ -180,7 +180,7 @@ var ViewModel = function () {
   		console.log('calling the getWiki function');
 	    // load wikipedia data
 	    //todo replace the Alpharetta with a city from the clickedMarker.address
-	    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=Alpharetta&format=json&callback=wikiCallback';
+	    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + clickedMarker.title + '&format=json&callback=wikiCallback';
 	    var wikiRequestTimeout = setTimeout(function(){
 	        $wikiElem.text("failed to get wikipedia resources");
 	        console.log('reached the failed message');
@@ -201,7 +201,6 @@ var ViewModel = function () {
 			        console.log('url found:' + url);
 	                $wikiElem.append('<li><a href="' + url + '">' + articleStr + '</a></li>');
 	            };
-
 	            clearTimeout(wikiRequestTimeout);
 	        }
 	    });
