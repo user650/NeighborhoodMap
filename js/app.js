@@ -11,8 +11,9 @@ var Model = {
 		latLng: {lat: 33.771126, lng: -84.396454},
 		address: '606-608 Luckie St NW<br>Atlanta, GA 30313',
 		url: 'https://www.worldofcoca-cola.com/',
-		iconImage: 'img/football.png',
-		visible: false
+		iconImage: 'img/cola.jpg',
+		visible: true,
+		highlight: ko.observable(false)
 	},
 	{
 		title:	'Turner Field',
@@ -20,7 +21,8 @@ var Model = {
 		address: '755 Hank Aaron Dr SE<br>Atlanta, GA 30315',
 		url: 'http://atlanta.braves.mlb.com/atl/ballpark/',
 		iconImage: 'img/baseball.png',
-		visible: true
+		visible: true,
+		highlight: ko.observable(false)
 	},
 	{
 		title:	'Georgia Aquarium',
@@ -28,7 +30,8 @@ var Model = {
 		address: '225 Baker St NW<br>Atlanta, GA 30313',
 		url: 'http://www.georgiaaquarium.org/',
 		iconImage: 'img/fish.png',
-		visible: true
+		visible: true,
+		highlight: ko.observable(false)
 	},
 	{
 		title:	'Six Flags Over Georgia',
@@ -36,7 +39,8 @@ var Model = {
 		address: '275 Riverside Pkwy<br>Austell, GA 30168',
 		url: 'https://www.sixflags.com/overgeorgia',
 		iconImage: 'img/rollercoaster.png',
-		visible: true
+		visible: true,
+		highlight: ko.observable(false)
 	},
 	{	
 		title:	'Lake Lanier Islands',
@@ -44,7 +48,8 @@ var Model = {
 		address: '7000 LANIER ISLANDS PARKWAY<br>BUFORD, GA 30518',
 		url: 'http://www.lanierislands.com/',
 		iconImage: 'img/waterski.jpg',
-		visible: true
+		visible: true,
+		highlight: ko.observable(false)
 	},
 	{
 		title: 'The Georgia Dome',
@@ -52,7 +57,8 @@ var Model = {
 		address: '1 Georgia Dome Dr.<br>Atlanta, GA 30313',
 		url: 'http://www.gadome.com/',
 		iconImage: 'img/football.png',
-		visible: true
+		visible: true,
+		highlight: ko.observable(false)
 	},
 	{
 		title: 'Echelon Golf Club',
@@ -60,7 +66,8 @@ var Model = {
 		address: '201 Traditions Dr.<br>Alpharetta, GA 30004',
 		url: 'http://www.echelongolf.com/',
 		iconImage: 'img/golf.png',
-		visible: true
+		visible: true,
+		highlight: ko.observable(false)
 	},
 	{
 		title: "Hawk's Ridge Golf Club",
@@ -68,7 +75,8 @@ var Model = {
 		address: '1100 Hawks Ridge Golf Club<br>Ball Ground, GA 30107',
 		url: 'http://www.hawksridge.com/',
 		iconImage: 'img/golf.png',
-		visible: true
+		visible: true,
+		highlight: ko.observable(false)
 	},
 	{
 		title: 'In Your Dreams Farm',
@@ -76,7 +84,8 @@ var Model = {
 		address: '17875 Birmingham Hwy<br>Alpharetta, GA 30004',
 		url: 'https://www.facebook.com/In-Your-Dreams-Farm-325164227564058/',
 		iconImage: 'img/horse.png',
-		visible: true
+		visible: true,
+		highlight: ko.observable(false)
 	}
   ],
   miltonCenter: {lat: 33.931375, lng: -84.381658}
@@ -125,7 +134,8 @@ var ViewModel = function () {
 					title: markerItem.title,
 					visible: markerItem.visible,
 					address: markerItem.address,
-					url: markerItem.url
+					url: markerItem.url,
+					highlight: markerItem.highlight
         	});
 
 	   	/*set the functions to call in a click */
@@ -150,6 +160,10 @@ var ViewModel = function () {
 	}(); // this extra () is needed to force the initMap function to run on applyBindings
 
 	this.toggleBounce = function (clickedMarker) {
+		
+		/* hightlight the clicked marker on the list. */
+		clickedMarker.highlight(true);
+
 		/* if the clicked marker is not animated then stop the animation on 
 		all of the markers and then bounce the one that is clikced */
 		if (clickedMarker.getAnimation() == null) {

@@ -13,17 +13,17 @@
   <body>
         <div id="header"><img src="img/milton.jpg" alt="Milton, GA" class="logo">
             <h1>Milton, Georgia<br>Neighborhood Area Guide</h1>
-            <div id="nav-bar" class="list">
-                <form data-bind="submit: processFilter">
-                    <input type="text" placeholder="enter location to filter" data-bind="value: searchString">
+            <div id="nav-bar">
+                <form data-bind="submit: processFilter" class="searchBar">
+                    <input type="text" placeholder="<filter for location>" data-bind="value: searchString">
                     <button type="submit">Search</button>
                 </form>
                 <ul data-bind="foreach: markerList">
-                    <li data-bind="visible: visible, text: title, click: $parent.toggleBounce"></li>
+                    <li data-bind="visible: visible, text: title, click: $parent.toggleBounce, css: {'selected': highlight()}"></li>
                 </ul>
                 <div class="wikipedia-container">
                     <h3 id="wikipedia-header">Relevant Wikipedia Links</h3>
-                    <ul id="wikipedia-links">Select a location to find links to relevant Wikipedia articles here!</ul>
+                    <ul id="wikipedia-links"></ul>
                 </div>
             </div>
             <div id="map">Got the map</div>
