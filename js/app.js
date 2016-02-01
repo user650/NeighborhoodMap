@@ -147,7 +147,7 @@ var ViewModel = function () {
 
 	var initMap = function () {
 			//render the inital map
-		  	map = new google.maps.Map(document.getElementById('map'), {
+		  	map = new google.maps.Map(document.getElementById('map-container'), {
 		    		center: Model.miltonCenter,
 		    		zoom: 10
 			});
