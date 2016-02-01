@@ -15,7 +15,7 @@
         <div class="row">
             <div class="col-md-3">
                     <div class="row">
-                            <img src="img/milton.jpg" alt="Milton, GA" class="logo">
+                            <img src="img/milton.jpg" alt="Milton, GA">
                     </div>
                     <div class="row">
                             <form data-bind="submit: processFilter" class="searchBar">
@@ -23,7 +23,7 @@
                                 <button type="submit">Search</button>
                             </form>
                     </div>
-                    <div class="row">
+                    <div class="row list">
                             <ul data-bind="foreach: markerList">
                                 <li data-bind="visible: visible, text: title, click: $parent.toggleBounce, css: {'selected': highlight()}"></li>
                             </ul>
@@ -35,8 +35,13 @@
                             </div>
                     </div>
             </div>
-            <div class="col-md-9 text-center" id="map-container">
-                <div id="map"> hello map are you there ????!!!  </div>
+            <div class="col-md-9 text-center">
+                <div class="row">
+                    <h1>Milton, Georgia - Neighborhood Area Guide</h1>
+                </div>
+                <div class="row" id="map-container">
+                    <div id="map"></div>
+                </div>
             </div>
         </div>
     </div>

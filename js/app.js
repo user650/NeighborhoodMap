@@ -7,7 +7,7 @@ var $wikiElem = $('#wikipedia-links');
 var Model = {
   miltonMarker: [
     {
-      	title: 'Coca Cola Factory',
+      	title: 'Coca Cola',
 		latLng: {lat: 33.771126, lng: -84.396454},
 		address: '606-608 Luckie St NW<br>Atlanta, GA 30313',
 		url: 'https://www.worldofcoca-cola.com/',
