@@ -1,9 +1,5 @@
 .header {
-  position: fixed;
   width: 100%;
-  height: 50px;
-  top: 0;
-  left: 276;
   background-color: #58453E;
   opacity: 1;
   z-index: 49;
@@ -19,6 +15,14 @@ html, body {
   margin: 0;
   padding: 0;
 }
+
+.list {
+  background-color: #58453E;
+  z-index: 50;
+  backface-visibility: hidden; /* for performance */
+  will-change: transform;    /* allows browser to determine need to layers */
+}
+
 #nav-bar {
   position: fixed;
   display: block;
@@ -59,11 +63,12 @@ li {
   background-color: #4272DB;
 }
 
-#map {
-  width: 100%;
+#themap {
   height: 100%;
+  width: 100%;
   background-color: #ccc;
 }
+
 h1 {
   font-family: 'Belleza', sans-serif;
   letter-spacing: .02em;
