@@ -161,18 +161,19 @@ var ViewModel = function () {
 
 	this.toggleBounce = function (clickedMarker) {
 		
-		/* hightlight the clicked marker on the list. */
-		clickedMarker.highlight(true);
-
 		/* if the clicked marker is not animated then stop the animation on 
 		all of the markers and then bounce the one that is clikced */
 		if (clickedMarker.getAnimation() == null) {
 			markerList().forEach(function(markerItem){
 				markerItem.setAnimation(null);
+				markerItem.highlight(false);
 			});
 
 			//bounce the icon
 			clickedMarker.setAnimation(google.maps.Animation.BOUNCE);
+
+			/* hightlight the clicked marker on the list */
+			clickedMarker.highlight(true);
 
 			//load the wikipedia inforamtion
 			self.getWiki(clickedMarker);
@@ -183,6 +184,8 @@ var ViewModel = function () {
 		    	content: contentString
 		  	});
 	   		infowindow.open(map, clickedMarker);
+  		
+
   		}
   		else {
   			/* if the current marker is bouncing then keep the infoWindow displayed, but stop the bouncing of the icon */
@@ -206,7 +209,7 @@ var ViewModel = function () {
 	        jsonp: "callback",
 	        success: function( response ) {
 	            var articleList = response[1];
-	            console.log('in the response function');
+	            console.log('Wiki response Received.. ');
 	            console.log('reponse = ' + response);
 	            console.log('articleList = ' + articleList);
 	            for (var i = 0; i < articleList.length; i++) {

@@ -2,7 +2,7 @@
 <html>
   <link rel="stylesheet" type="text/css" href="css/style.css" async>
   <head>
-    <title>Milton Area Map</title>
+    <title>Milton Neighborhood Map</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <!-- Google fonts -->
@@ -11,23 +11,22 @@
   </head>
 
   <body>
-        <div id="header"><img src="img/milton.jpg" alt="Milton, GA" class="logo">
-            <h1>Milton, Georgia<br>Neighborhood Area Guide</h1>
-            <div id="nav-bar">
-                <form data-bind="submit: processFilter" class="searchBar">
-                    <input type="text" placeholder="<filter for location>" data-bind="value: searchString">
-                    <button type="submit">Search</button>
-                </form>
-                <ul data-bind="foreach: markerList">
-                    <li data-bind="visible: visible, text: title, click: $parent.toggleBounce, css: {'selected': highlight()}"></li>
-                </ul>
-                <div class="wikipedia-container">
-                    <h3 id="wikipedia-header">Relevant Wikipedia Links</h3>
-                    <ul id="wikipedia-links"></ul>
-                </div>
-            </div>
-            <div id="map">Got the map</div>
+    <h1 class="header">Milton, Georgia Neighborhood Area Guide</h1>
+    <div id="nav-bar">
+        <div id="header"><img src="img/milton.jpg" alt="Milton, GA" class="logo"></div>
+        <form data-bind="submit: processFilter" class="searchBar">
+            <input type="text" placeholder="<filter for location>" data-bind="value: searchString">
+            <button type="submit">Search</button>
+        </form>
+        <ul data-bind="foreach: markerList">
+            <li data-bind="visible: visible, text: title, click: $parent.toggleBounce, css: {'selected': highlight()}"></li>
+        </ul>
+        <div class="wikipedia-container">
+            <h3 id="wikipedia-header">Relevant Wikipedia Links</h3>
+            <ul id="wikipedia-links"></ul>
         </div>
+    </div>
+    <div id="map">Got the map</div>
   
     <script src="js/libs/knockout-3.4.0.js"></script>
     <script src="js/libs/jquery.min.js"></script>
