@@ -16,6 +16,15 @@ var Model = {
 		highlight: ko.observable(false)
 	},
 	{
+		title: 'AMC',
+		latLng: {lat: 34.048134, lng: -84.296139},
+		address:'North Point Mall, 4500 North Point Cir, Alpharetta, GA 30022',
+		url: 'https://www.amctheatres.com/movie-theatres/atlanta/amc-north-point-mall-12',
+		iconImage: 'img/movie.jpg',
+		visible: true,
+		highlight: ko.observable(false)
+	},
+	{
 		title:	'Turner Field',
 		latLng: {lat: 33.735067, lng: -84.38999433}, 
 		address: '755 Hank Aaron Dr SE<br>Atlanta, GA 30315',
@@ -99,8 +108,6 @@ var ViewModel = function () {
 
 	//this fucntion will update the visible property of the markerList 
 	this.processFilter = function(bob){
-		console.log('bob = ' + bob);
-		console.log ('searchString = ' + self.searchString());
 		markerList().forEach(function(markerItem){
 
 			/* Sample taken from sample http://opensoul.org/2011/06/23/live-search-with-knockoutjs/
@@ -109,7 +116,6 @@ var ViewModel = function () {
 
 			if (self.searchString() == '' || markerItem.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
 				markerItem.setVisible(true);
-				console.log('Match : ' + markerItem.title);
 			} else {
 				markerItem.setVisible(false);
 			}
@@ -194,13 +200,10 @@ var ViewModel = function () {
   	};
 
   	this.getWiki = function (clickedMarker){
-  		console.log('calling the getWiki function');
 	    // load wikipedia data
-	    //todo replace the Alpharetta with a city from the clickedMarker.address
 	    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + clickedMarker.title + '&format=json&callback=wikiCallback';
 	    var wikiRequestTimeout = setTimeout(function(){
 	        $wikiElem.text("failed to get wikipedia resources");
-	        console.log('reached the failed message');
 	    }, 8000);
 
 	    $.ajax({
@@ -209,14 +212,10 @@ var ViewModel = function () {
 	        jsonp: "callback",
 	        success: function( response ) {
 	            var articleList = response[1];
-	            console.log('Wiki response Received.. ');
-	            console.log('reponse = ' + response);
-	            console.log('articleList = ' + articleList);
 	            for (var i = 0; i < articleList.length; i++) {
 	                articleStr = articleList[i];
 	                var url = 'http://en.wikipedia.org/wiki/' + articleStr;
-			        console.log('url found:' + url);
-	                $wikiElem.append('<li><a href="' + url + '">' + articleStr + '</a></li>');
+	                $wikiElem.prepend('<li><a href="' + url + '">' + articleStr + '</a></li>');
 	            };
 	            clearTimeout(wikiRequestTimeout);
 	        }
