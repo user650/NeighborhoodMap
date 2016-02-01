@@ -58,15 +58,14 @@ li {
   cursor: pointer;
 }
 
+#map {
+  height: 100%;
+  width: 100%;
+}
+
 .selected, li:hover {
   color: #FFFFFF;
   background-color: #4272DB;
-}
-
-#themap {
-  height: 100%;
-  width: 100%;
-  background-color: #ccc;
 }
 
 h1 {
