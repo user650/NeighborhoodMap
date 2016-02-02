@@ -65,7 +65,7 @@ var Model = {
 		latLng: {lat: 33.757694, lng: -84.400625},
 		address: '1 Georgia Dome Dr.<br>Atlanta, GA 30313',
 		url: 'http://www.gadome.com/',
-		iconImage: 'img/football.png',
+		iconImage: 'img/football.jpg',
 		visible: true,
 		highlight: ko.observable(false)
 	},
@@ -148,6 +148,7 @@ var ViewModel = function () {
 	   	marker.addListener('click', function() {
 			self.toggleBounce(marker);
   		});
+
         markerList.push(marker);  // push all of the google marker objects to the markerList arrary
     });
 
@@ -163,6 +164,9 @@ var ViewModel = function () {
 			markerList().forEach(function(markerItem){
 				markerItem.setMap(map);
 			});
+
+		    infowindow = new google.maps.InfoWindow({maxWidth: 300});
+
 	}(); // this extra () is needed to force the initMap function to run on applyBindings
 
 	this.toggleBounce = function (clickedMarker) {
@@ -175,6 +179,9 @@ var ViewModel = function () {
 				markerItem.highlight(false);
 			});
 
+			//pan to the clicked marker
+			map.panTo(clickedMarker.position);
+			
 			//bounce the icon
 			clickedMarker.setAnimation(google.maps.Animation.BOUNCE);
 
@@ -185,13 +192,10 @@ var ViewModel = function () {
 			self.getWiki(clickedMarker);
 		 	
 		 	// load the infoWindow
+		  	infowindow.close();
 		 	var contentString = '<h3>' + clickedMarker.title + '</h3>' + clickedMarker.address + '<br>' + '<a href="' + clickedMarker.url + '">' + clickedMarker.url + '</a>';
-		  	var infowindow = new google.maps.InfoWindow({
-		    	content: contentString
-		  	});
+		  	infowindow.setContent(contentString);
 	   		infowindow.open(map, clickedMarker);
-  		
-
   		}
   		else {
   			/* if the current marker is bouncing then keep the infoWindow displayed, but stop the bouncing of the icon */
