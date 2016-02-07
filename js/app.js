@@ -98,14 +98,21 @@ var Model = {
 var viewModel = function () {
 	var self = this; 
 	var map; // the google map object
-	var placeList = ko.observableArray([]); // list of location objects.
+	self.placeList = ko.observableArray([]); // list of location objects.
+	self.fred = ko.observableArray([
+		{letter: "q"},
+		{letter: "r"},
+		{letter: "s"},
+		{letter: "t"}
+	]);
 
 	//for each item in the modle array create new locatoin object in the placeList array.
 	var i = 0;
 	Model.markers.forEach(function(myMarker) {
-		console.log('hi. pushing this model : ' + myMarker.title);
-		placeList.push(new Location(myMarker));
-		console.log(placeList()[i++].marker.title);
+		console.log('myMarker.title : ' + myMarker.title);
+		self.placeList.push(new Location(myMarker));
+		console.log('self.placeList()[i++].marker.title : ' + self.placeList()[i++].marker.title);
+		//fred.push(myMarker.title);
 		/*try to throw a random listener in there I think.
 	  	placeList()[i++].marker.addListener('click', function() {
 			self.toggleBounce(marker);
@@ -125,7 +132,7 @@ var viewModel = function () {
 			if (self.searchString() == '' || markerItem.marker.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
 				markerItem.marker.setVisible(true);
 			} else {
-				markerItem.marker.etVisible(false);
+				markerItem.marker.setVisible(false);
 			}
 		});
 	
@@ -147,7 +154,7 @@ var viewModel = function () {
 
 			/*Plop the makers on the map;
 			for each marker in the markerList draw it on the map with .setMap */
-			placeList().forEach(function(markerItem){
+			self.placeList().forEach(function(markerItem){
 				markerItem.marker.setMap(map);
 			});
 

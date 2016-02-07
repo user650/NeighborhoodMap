@@ -24,10 +24,8 @@
                             </form>
                     </div>
                     <div class="row list">
-                        <ul data-bind="foreach: viewModel.placeList">
-                            <li data-bind="text: marker.title, click: toggleBounce, css: {'selected': highlight()}">
-                                ererwerehi
-                            </li>
+                        <ul data-bind="foreach: placeList">
+                            <li data-bind="visible: marker.visible, text: marker.title"></li>
                         </ul>
                     </div>
                     <div class="row">
