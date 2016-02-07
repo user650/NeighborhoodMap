@@ -24,9 +24,11 @@
                             </form>
                     </div>
                     <div class="row list">
-                            <ul data-bind="foreach: markerList">
-                                <li data-bind="visible: visible, text: title, click: $parent.toggleBounce, css: {'selected': highlight()}"></li>
-                            </ul>
+                        <ul data-bind="foreach: viewModel.placeList">
+                            <li data-bind="text: marker.title, click: toggleBounce, css: {'selected': highlight()}">
+                                ererwerehi
+                            </li>
+                        </ul>
                     </div>
                     <div class="row">
                             <div class="wikipedia-container">
