@@ -47,9 +47,9 @@ Location.prototype.getWiki = function () {
 // load the infoWindow
 Location.prototype.infoWindowToggle = function () {
   	infowindow.close();
- 	var contentString = '<h3>' + clickedMarker.marker.title + '</h3>' + clickedMarker.marker.address + '<br>' + '<a href="' + clickedMarker.marker.url + '">' + clickedMarker.marker.url + '</a>';
+ 	var contentString = '<h3>' + this.marker.title + '</h3>' + this.marker.address + '<br>' + '<a href="' + this.marker.url + '">' + this.marker.url + '</a>';
   	infowindow.setContent(contentString);
-	infowindow.open(map, clickedMarker.marker);
+	infowindow.open(viewModel.map, this.marker);
 };
 
 Location.prototype.toggleAnimation = function() {
@@ -193,7 +193,8 @@ var viewModel = function () {
 		/* if the clicked marker is not animated then stop the animation on 
 		all of the markers and then bounce the one that is clikced */
 		clickedMarker.toggleAnimation();
-		
+		clickedMarker.infoWindowToggle();
+
 		//pan to the clicked marker
 		map.panTo(clickedMarker.marker.position);
 		clickedMarker.marker.setMap(map);
@@ -201,7 +202,8 @@ var viewModel = function () {
 		//stop all of the icons that are not clicked
 		self.placeList().forEach(function(markerItem){
 			if (markerItem !== clickedMarker) {
-				markerItem.stopAnimation;
+				console.log('call stopAnimation');
+				markerItem.stopAnimation();
 			}
 		})
   	};
