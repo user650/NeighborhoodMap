@@ -33,7 +33,12 @@ li {
 
 .selected, li:hover {
   color: #FFFFFF;
-  background-color: #4272DB;
+ /* background-color: #4272DB; 
+  background-color: #BDBE92; */
+  background-color: #58453E;
+
+.li:hover {
+  color: #FFFFFF;
 }
 
 h1 {
