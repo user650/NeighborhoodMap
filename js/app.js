@@ -63,19 +63,7 @@ Location.prototype.infoWindowToggle = function () {
 	infowindow.open(viewModel.map, this.marker);
 };
 
-/*Location.prototype.toggleAnimation = function() {
-	console.log('toggle animation : ' + this.marker.title);
-	if (this.marker.getAnimation() == null) {
-		this.marker.setAnimation(google.maps.Animation.BOUNCE);
-		this.marker.highlight = true;
-	} else {
-		this.marker.setAnimation(null);
-		this.marker.highlight = false;
-	};
-}; */
-
 Location.prototype.stopAnimation = function() {
-	console.log('stop animation : ' + this.marker.title);
 	this.marker.setAnimation(null);
 	this.marker.highlight = false;
 };
@@ -88,63 +76,72 @@ var Model = {
 			latLng: {lat: 33.771126, lng: -84.396454},
 			address: '606-608 Luckie St NW<br>Atlanta, GA 30313',
 			url: 'https://www.worldofcoca-cola.com/',
-			iconImage: 'img/cola.jpg'
+			iconImage: 'img/cola.jpg',
+			visible: false
 		},
 		{
 			title: 'AMC',
 			latLng: {lat: 34.048134, lng: -84.296139},
 			address:'North Point Mall, 4500 North Point Cir, Alpharetta, GA 30022',
 			url: 'https://www.amctheatres.com/movie-theatres/atlanta/amc-north-point-mall-12',
-			iconImage: 'img/movie.jpg'
+			iconImage: 'img/movie.jpg',
+			visible: true
 		},
 		{
 			title:	'Turner Field',
 			latLng: {lat: 33.735067, lng: -84.38999433}, 
 			address: '755 Hank Aaron Dr SE<br>Atlanta, GA 30315',
 			url: 'http://atlanta.braves.mlb.com/atl/ballpark/',
-			iconImage: 'img/baseball.png'
+			iconImage: 'img/baseball.png',
+			visible: true
 		},
 		{
 			title:	'Georgia Aquarium',
 			latLng: {lat: 33.763627, lng: -84.395121},
 			address: '225 Baker St NW<br>Atlanta, GA 30313',
 			url: 'http://www.georgiaaquarium.org/',
-			iconImage: 'img/fish.png'
+			iconImage: 'img/fish.png',
+			visible: true
 		},
 		{
 			title:	'Six Flags Over Georgia',
 			latLng: {lat: 33.768570, lng: -84.550910},
 			address: '275 Riverside Pkwy<br>Austell, GA 30168',
 			url: 'https://www.sixflags.com/overgeorgia',
-			iconImage: 'img/rollercoaster.png'
+			iconImage: 'img/rollercoaster.png',
+			visible: true
 		},
 		{	
 			title:	'Lake Lanier Islands',
 			latLng: {lat: 34.177871, lng: -84.030111},
 			address: '7000 LANIER ISLANDS PARKWAY<br>BUFORD, GA 30518',
 			url: 'http://www.lanierislands.com/',
-			iconImage: 'img/waterski.jpg'
+			iconImage: 'img/waterski.jpg',
+			visible: true
 		},
 		{
 			title: 'The Georgia Dome',
 			latLng: {lat: 33.757694, lng: -84.400625},
 			address: '1 Georgia Dome Dr.<br>Atlanta, GA 30313',
 			url: 'http://www.gadome.com/',
-			iconImage: 'img/football.jpg'
+			iconImage: 'img/football.jpg',
+			visible: true
 		},
 		{
 			title: 'Echelon Golf Club',
 			latLng: {lat: 34.197036, lng: -84.286404},
 			address: '201 Traditions Dr.<br>Alpharetta, GA 30004',
 			url: 'http://www.echelongolf.com/',
-			iconImage: 'img/golf.png'
+			iconImage: 'img/golf.png',
+			visible: true
 		},
 		{
 			title: "Hawk's Ridge Golf Club",
 			latLng: {lat: 34.258384, lng: -84.281266},
 			address: '1100 Hawks Ridge Golf Club<br>Ball Ground, GA 30107',
 			url: 'http://www.hawksridge.com/',
-			iconImage: 'img/golf.png'
+			iconImage: 'img/golf.png',
+			visible: true
 		},
 		{
 			title: 'In Your Dreams Farm',
@@ -152,6 +149,7 @@ var Model = {
 			address: '17875 Birmingham Hwy<br>Alpharetta, GA 30004',
 			url: 'https://www.facebook.com/In-Your-Dreams-Farm-325164227564058/',
 			iconImage: 'img/horse.png',
+			visible: true
 		}
 	]
 };
@@ -209,21 +207,25 @@ var viewModel = function () {
 
   	
   	//this fucntion will update the visible property of the searchList based on the searchString 
-   self.processFilter = function(bob){
-		placeList().forEach(function(markerItem){
-
-			console.log('bob fucntion');
-			/* Sample taken from sample http://opensoul.org/2011/06/23/live-search-with-knockoutjs/
-			use the indexOf() to search for the searchString within each of the markerList items.  The visible marker will set
-			how / if the marker will display.  */
-
-			if (self.searchString() == '' || markerItem.marker.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
-				markerItem.marker.setVisible(true);
+   self.processFilter = function(){
+		self.placeList().forEach(function(locItem){
+			//The visible property of the marker will set if the marker will display.  */
+			if (self.searchString() == '' || locItem.marker.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
+				locItem.marker.setVisible(true);
 			} else {
-				markerItem.marker.setVisible(false);
+				locItem.marker.setVisible(false);
 			}
 		});
 
+		//trigger a change to the placeList array so it will display on the screen
+		var tempList = ko.observableArray(self.placeList());
+		self.placeList([]);
+		for (var x=0; x < tempList().length; x++){
+		    self.placeList.push(tempList()[x]);
+		};
+
+		//temp() = self.placeList;
+		//self.placeList() = temp();
 	};
 }
 ko.applyBindings(new viewModel());
