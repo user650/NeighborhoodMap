@@ -2,11 +2,21 @@
    Scott Stubbs December 2015 
    use Milton, GA / North Atlanta as the center of the map */
 
-
 var $wikiElem = $('#wikipedia-links');
 
 //constructor function for a location object
 var Location = function(data) {
+
+	this.toggleAnimation = function () {
+		console.log('toggle marker : ' + this.marker.title);
+		if (this.marker.getAnimation() == null) {
+			this.marker.setAnimation(google.maps.Animation.BOUNCE);
+			this.marker.highlight = true;
+		} else {
+			this.marker.setAnimation(null);
+			this.marker.highlight = false;
+		};
+	}
 	this.marker = new google.maps.Marker({
 		title: data.title,
 		position: data.latLng,
@@ -47,12 +57,13 @@ Location.prototype.getWiki = function () {
 // load the infoWindow
 Location.prototype.infoWindowToggle = function () {
   	infowindow.close();
+  	console.log('trying to open the info window');
  	var contentString = '<h3>' + this.marker.title + '</h3>' + this.marker.address + '<br>' + '<a href="' + this.marker.url + '">' + this.marker.url + '</a>';
   	infowindow.setContent(contentString);
 	infowindow.open(viewModel.map, this.marker);
 };
 
-Location.prototype.toggleAnimation = function() {
+/*Location.prototype.toggleAnimation = function() {
 	console.log('toggle animation : ' + this.marker.title);
 	if (this.marker.getAnimation() == null) {
 		this.marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -61,7 +72,7 @@ Location.prototype.toggleAnimation = function() {
 		this.marker.setAnimation(null);
 		this.marker.highlight = false;
 	};
-};
+}; */
 
 Location.prototype.stopAnimation = function() {
 	console.log('stop animation : ' + this.marker.title);
@@ -148,6 +159,7 @@ var Model = {
 var viewModel = function () {
 	var self = this; 
 	var map; // the google map object
+	var lastLocItem = null;
 	self.placeList = ko.observableArray([]); // list of location objects.
 	self.searchString = ko.observable('');
 
@@ -165,48 +177,36 @@ var viewModel = function () {
 		});
 
 		//Plop the makers on the map; for each marker in the markerList draw it on the map with .setMap
-		self.placeList().forEach(function(markerItem){
-			markerItem.marker.setMap(map);
-	        
-		 	/*TODO here I needed to place the fucntion directly into this event.
-		 	it would be nice to have the event invoke the .toggleBounce function embedded in marker object
-		 	but I could not get this to work. it is not defined at the time that I am declarnig this event */
-		    google.maps.event.addListener(markerItem.marker, 'click', function() {
-				if (markerItem.marker.getAnimation() == null) {
-					markerItem.marker.setAnimation(google.maps.Animation.BOUNCE);
-					markerItem.marker.highlight = true;
-				} else {
-					markerItem.marker.setAnimation(null);
-					markerItem.marker.highlight = false;
+		self.placeList().forEach(function(locItem){
+			locItem.marker.setMap(map);
+			locItem.marker.addListener('click', function () {
+				if (lastLocItem !== null) {
+					lastLocItem.stopAnimation(); //stop the last clicked one
 				};
+				locItem.toggleAnimation(); // togole the current clikced one
+				lastLocItem = locItem; // store the current into last
+				map.panTo(locItem.marker.position);
+				locItem.marker.setMap(map);
 			});
-
 		});
 
 	    infowindow = new google.maps.InfoWindow({maxWidth: 300});
 
 	}(); // this extra () is needed to force the initMap function to run on applyBindings
 
-	self.toggleBounce = function (clickedMarker) {
-		
-		console.log('clicked list item : ' + clickedMarker.marker.title);
-		/* if the clicked marker is not animated then stop the animation on 
-		all of the markers and then bounce the one that is clikced */
-		clickedMarker.toggleAnimation();
-		clickedMarker.infoWindowToggle();
+	self.toggleBounce = function (locItem) {
+		if (lastLocItem !== null) {
+			lastLocItem.stopAnimation();
+		};
+		locItem.toggleAnimation();
+		lastLocItem = locItem;
+		locItem.infoWindowToggle();
 
 		//pan to the clicked marker
-		map.panTo(clickedMarker.marker.position);
-		clickedMarker.marker.setMap(map);
-
-		//stop all of the icons that are not clicked
-		self.placeList().forEach(function(markerItem){
-			if (markerItem !== clickedMarker) {
-				console.log('call stopAnimation');
-				markerItem.stopAnimation();
-			}
-		})
+		map.panTo(locItem.marker.position);
+		locItem.marker.setMap(map);
   	};
+
   	
   	//this fucntion will update the visible property of the searchList based on the searchString 
    self.processFilter = function(bob){
