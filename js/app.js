@@ -1,22 +1,16 @@
 /* FEND - Project 5 - Neighborhood Map 
-   Scott Stubbs December 2015 
-   use Milton, GA / North Atlanta as the center of the map */
+   Scott Stubbs Original Creation : December 2015 
+   use Milton, GA - North Atlanta as the center of the map 
+
+   2/28/2016 - ss made several addtional updates to change this is object orented per recommendation from instructor
+*/
 
 var $wikiElem = $('#wikipedia-links');
 
-//constructor function for a location object
+//constructor function for a location object.  Locations will include markers and infoWindows
 var Location = function(data) {
 
-	this.toggleAnimation = function () {
-		console.log('toggle marker : ' + this.marker.title);
-		if (this.marker.getAnimation() == null) {
-			this.marker.setAnimation(google.maps.Animation.BOUNCE);
-			this.marker.highlight(true);
-		} else {
-			this.marker.setAnimation(null);
-			this.marker.highlight(false);
-		};
-	}
+	// setup the markers using the passed in data
 	this.marker = new google.maps.Marker({
 		title: data.title,
 		position: data.latLng,
@@ -26,14 +20,39 @@ var Location = function(data) {
 		draggable: false,
 		Animation: google.maps.Animation.DROP,
 		visible: true,
-		highlight: ko.observable(false)
+		highlight: ko.observable(false),
 	});
-	this.infoW = ko.observable('Pending search...');
+
+    // setup a new infoWindow for each location.
+    this.infoWindow = new google.maps.InfoWindow({maxWidth: 300});
 };
 
+// this method will toggle anaimation bounce and highlight the list item that is selected.
+Location.prototype.toggleLoc = function () {
+		if (this.marker.getAnimation() == null) {
+			this.marker.setAnimation(google.maps.Animation.BOUNCE);
+			this.marker.highlight(true);
+		} else {
+			this.marker.setAnimation(null);
+			this.marker.highlight(false);
+		};
+		this.infoWindow.open();
+};
+
+//this method will stop the bouncing and close the infoWindow
+Location.prototype.stopLoc = function() {
+	this.marker.setAnimation(null);
+	this.marker.highlight(false);
+	this.infoWindow.close();
+};
+
+//this method pulls in information from wikipedia using the loaction
 Location.prototype.getWiki = function () {
-    // load wikipedia data
-    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + clickedMarker.marker.title + '&format=json&callback=wikiCallback';
+    
+    // load wikipedia data using this URL
+    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + this.marker.title + '&format=json&callback=wikiCallback';
+    
+    // set the time out duration and message
     var wikiRequestTimeout = setTimeout(function(){
         $wikiElem.text("failed to get wikipedia resources");
     }, 8000);
@@ -53,21 +72,7 @@ Location.prototype.getWiki = function () {
         }
     });
 };
-		 	
-// load the infoWindow
-Location.prototype.infoWindowToggle = function () {
-  	infowindow.close();
-  	console.log('trying to open the info window');
- 	var contentString = '<h3>' + this.marker.title + '</h3>' + this.marker.address + '<br>' + '<a href="' + this.marker.url + '">' + this.marker.url + '</a>';
-  	infowindow.setContent(contentString);
-	infowindow.open(viewModel.map, this.marker);
-};
-
-Location.prototype.stopAnimation = function() {
-	this.marker.setAnimation(null);
-	this.marker.highlight(false);
-};
-
+		
 var Model = {
 	miltonCenter: {lat: 33.931375, lng: -84.381658},
 	markers: [
@@ -167,57 +172,65 @@ var Model = {
 var viewModel = function () {
 	var self = this; 
 	var map; // the google map object
-	var lastLocItem = null;
+	var lastLocItem = null; //used to store the last clicked location
 	self.placeList = ko.observableArray([]); // list of location objects.
-	self.searchString = ko.observable('');
+	self.searchString = ko.observable(''); // the filter text entered by the user
 
-	//for each item in the modle array create new locatoin object in the placeList array.
-	var i = 0;
+	//Populate the ko placeList observable array, 
+	//for each item in the Model array create new locattion object in the placeList array.
 	Model.markers.forEach(function(myMarker) {
 		self.placeList.push(new Location(myMarker));
 	});
 
-	var initMap = function () {
-		//render the inital map
-	  	map = new google.maps.Map(document.getElementById('map-container'), {
-	    		center: Model.miltonCenter,
-	    		zoom: 10
-		});
+	//render the inital map
+  	map = new google.maps.Map(document.getElementById('map-container'), {
+    		center: Model.miltonCenter,
+    		zoom: 10
+	});
 
-		//Plop the makers on the map; for each marker in the markerList draw it on the map with .setMap
-		self.placeList().forEach(function(locItem){
+	// for each Location setup the markers and the infoWindow
+	self.placeList().forEach(function(locItem){
+
+		// drop the marker
+		locItem.marker.setMap(map);
+
+		// add the click event to the marker
+		locItem.marker.addListener('click', function () {
+			if (lastLocItem !== null) {
+				lastLocItem.stopLoc(); //stop the last clicked one
+				lastLocItem.infoWindow.close() //close the last infoWindow
+			};
+			locItem.toggleLoc(); // togole the current clikced one
+			locItem.infoWindow.open(map, locItem.marker);
+			//TODO locItem.getWiki();			
+			
+			lastLocItem = locItem; // store the current into last
+			map.panTo(locItem.marker.position);
 			locItem.marker.setMap(map);
-			locItem.marker.addListener('click', function () {
-				if (lastLocItem !== null) {
-					lastLocItem.stopAnimation(); //stop the last clicked one
-				};
-				locItem.toggleAnimation(); // togole the current clikced one
-				lastLocItem = locItem; // store the current into last
-				map.panTo(locItem.marker.position);
-				locItem.marker.setMap(map);
-			});
 		});
 
-	    infowindow = new google.maps.InfoWindow({maxWidth: 300});
+		// load the inforWindow Content
+		var contentString = '<h3>' + locItem.marker.title + '</h3>' + locItem.marker.address + '<br>' + '<a href="' + locItem.marker.url + '">' + locItem.marker.url + '</a>';
+	  	locItem.infoWindow.setContent(contentString);
+	});
 
-	}(); // this extra () is needed to force the initMap function to run on applyBindings
-
+	//called when the one of the list items is clicked
 	self.toggleBounce = function (locItem) {
 		if (lastLocItem !== null) {
-			lastLocItem.stopAnimation();
+			lastLocItem.stopLoc();
+			locItem.infoWindow.close();
 		};
-		locItem.toggleAnimation();
+		locItem.toggleLoc();
+		locItem.infoWindow.open(map, locItem.marker);
 		lastLocItem = locItem;
-		locItem.infoWindowToggle();
 
 		//pan to the clicked marker
 		map.panTo(locItem.marker.position);
 		locItem.marker.setMap(map);
   	};
-
   	
   	//this fucntion will update the visible property of the searchList based on the searchString 
-   self.processFilter = function(){
+    self.processFilter = function(){
 		self.placeList().forEach(function(locItem){
 			//The visible property of the marker will set if the marker will display.  */
 			if (self.searchString() == '' || locItem.marker.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
@@ -233,9 +246,6 @@ var viewModel = function () {
 		for (var x=0; x < tempList().length; x++){
 		    self.placeList.push(tempList()[x]);
 		};
-
-		//temp() = self.placeList;
-		//self.placeList() = temp();
 	};
 }
 ko.applyBindings(new viewModel());
