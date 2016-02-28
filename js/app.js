@@ -1,16 +1,23 @@
-/* FEND - Project 5 - Neighborhood Map 
+/**
+   FEND - Project 5 - Neighborhood Map 
    Scott Stubbs Original Creation : December 2015 
-   use Milton, GA - North Atlanta as the center of the map 
+   use Milton, GA - North Atlanta as the center of the map
+*/ 
 
-   2/28/2016 - ss made several addtional updates to change this is object orented per recommendation from instructor
+/** 
+   Resubmission 2/28/2016 - ss made several addtional updates to change this is object orented per recommendation from instructor
 */
 
 var $wikiElem = $('#wikipedia-links');
 
-//constructor function for a location object.  Locations will include markers and infoWindows
+/** 
+	* Represents a location object which includes a merker and an infoWindow.
+	* @constructor
+	* @param {marker} - goggle marker data used to build the marker portion of the object 
+*/
 var Location = function(data) {
 
-	// setup the markers using the passed in data
+	/**  Setup the markers using the passed in data*/
 	this.marker = new google.maps.Marker({
 		title: data.title,
 		position: data.latLng,
@@ -23,11 +30,14 @@ var Location = function(data) {
 		highlight: ko.observable(false),
 	});
 
-    // setup a new infoWindow for each location.
+    /** setup a new infoWindow for each location. */
     this.infoWindow = new google.maps.InfoWindow({maxWidth: 300});
 };
 
-// this method will toggle anaimation bounce and highlight the list item that is selected.
+/** 
+	* This method will toggle anaimation bounce and highlight the list item that is selected.
+	* @constructor
+*/
 Location.prototype.toggleLoc = function () {
 		if (this.marker.getAnimation() == null) {
 			this.marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -39,7 +49,10 @@ Location.prototype.toggleLoc = function () {
 		this.infoWindow.open();
 };
 
-//this method will stop the bouncing and close the infoWindow
+/** 
+	* This method will stop the bouncing, close the infoWindow and clear the wiki information 
+	* @constructor
+*/
 Location.prototype.stopLoc = function() {
 	this.marker.setAnimation(null);
 	this.marker.highlight(false);
@@ -47,13 +60,16 @@ Location.prototype.stopLoc = function() {
     $wikiElem.html("");
 };
 
-//this method pulls in information from wikipedia using the loaction
+/**
+	* this method pulls in information from wikipedia using the loaction
+	* @constructor
+*/
 Location.prototype.getWiki = function () {
     
-    // load wikipedia data using this URL
+    /** load wikipedia data using this URL */
     var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + this.marker.title + '&format=json&callback=wikiCallback';
     
-    // set the time out duration and message
+    /** set the time out duration and message */
     var wikiRequestTimeout = setTimeout(function(){
         $wikiElem.text("failed to get wikipedia resources");
     }, 8000);
@@ -176,6 +192,9 @@ var Model = {
 	]
 };
 
+/** 
+	* viewModel performs all the setup and processing required to connect the Model and the View
+*/
 var viewModel = function () {
 	var self = this; 
 	var map; // the google map object
@@ -183,50 +202,52 @@ var viewModel = function () {
 	self.placeList = ko.observableArray([]); // list of location objects.
 	self.searchString = ko.observable(''); // the filter text entered by the user
 
-	//Populate the ko placeList observable array, 
-	//for each item in the Model array create new locattion object in the placeList array.
+	/**
+		* Populate the ko placeList observable array, 
+		* for each item in the Model array create new locattion object in the placeList array.
+	*/
 	Model.markers.forEach(function(myMarker) {
 		self.placeList.push(new Location(myMarker));
 	});
 
-	//render the inital map
+	/** render the inital map */
   	map = new google.maps.Map(document.getElementById('map-container'), {
     		center: Model.miltonCenter,
     		zoom: 10
 	});
 
-	// for each Location setup the markers and the infoWindow
+	/** for each Location setup the markers and the infoWindow */
 	self.placeList().forEach(function(locItem){
 
-		// drop the marker
+		/** drop the marker */
 		locItem.marker.setMap(map);
 
-		// add the click event to the marker
+		/** add the click event to the marker */
 		locItem.marker.addListener('click', function () {
 			if (lastLocItem !== null) {
-				lastLocItem.stopLoc(); //stop the last clicked one
-				lastLocItem.infoWindow.close() //close the last infoWindow
+				lastLocItem.stopLoc(); /** stop the last clicked one */
+				lastLocItem.infoWindow.close() /** close the last infoWindow */
 			};
-			locItem.toggleLoc(); // togole the current clikced one
+			locItem.toggleLoc(); /** togole the current clikced one */
 			locItem.infoWindow.open(map, locItem.marker);
 			locItem.getWiki();			
 			
-			lastLocItem = locItem; // store the current into last
+			lastLocItem = locItem; /** store the current into last */
 			map.panTo(locItem.marker.position);
 			locItem.marker.setMap(map);
 		});
 
-		// load the inforWindow Content
+		/** load the infoWindow Content */
 		var contentString = '<h3>' + locItem.marker.title + '</h3>' + locItem.marker.address + '<br>' + '<a href="' + locItem.marker.url + '">' + locItem.marker.url + '</a>';
 	  	locItem.infoWindow.setContent(contentString);
 
-	  	//add an event to stop the animation if user closes the infoWindow
+	  	/** add an event to stop the animation if user closes the infoWindow */
 	  	locItem.infoWindow.addListener('closeclick', function (){
-	  			locItem.stopLoc(); //stop the icon bounce
+	  			locItem.stopLoc(); /** stop the icon bounce */
 	  	});
 	});
 
-	//called when the one of the list items is clicked
+	/** called when the one of the list items is clicked */
 	self.toggleBounce = function (locItem) {
 		if (lastLocItem !== null) {
 			lastLocItem.stopLoc();
@@ -237,15 +258,15 @@ var viewModel = function () {
 		locItem.getWiki();
 		lastLocItem = locItem;
 
-		//pan to the clicked marker
+		/** pan to the clicked marker */
 		map.panTo(locItem.marker.position);
 		locItem.marker.setMap(map);
   	};
   	
-  	//this fucntion will update the visible property of the searchList based on the searchString 
+  	/** this fucntion will update the visible property of the searchList based on the searchString  */
     self.processFilter = function(){
 		self.placeList().forEach(function(locItem){
-			//The visible property of the marker will set if the marker will display.  */
+			/** The visible property of the marker will set if the marker will display.  */
 			if (self.searchString() == '' || locItem.marker.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
 				locItem.marker.setVisible(true);
 			} else {
@@ -253,7 +274,7 @@ var viewModel = function () {
 			}
 		});
 
-		//trigger a change to the placeList array so it will display on the screen
+		/** trigger a change to the placeList array so it will display on the screen */
 		var tempList = ko.observableArray(self.placeList());
 		self.placeList([]);
 		for (var x=0; x < tempList().length; x++){
