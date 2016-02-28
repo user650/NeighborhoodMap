@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+   FEND - Project 5 - Neighborhood Map 
+   Scott Stubbs Original Creation : December 2015 
+   use Milton, GA - North Atlanta as the center of the map
+*/ 
+
+/** 
+   Resubmission 2/28/2016 - ss made several addtional updates to change this is object orented per recommendation from instructor
+*/
+
+var $wikiElem = $('#wikipedia-links');
+
+/** 
+	* Represents a location object which includes a merker and an infoWindow.
+	* @constructor
+	* @param {marker} - goggle marker data used to build the marker portion of the object 
+*/
+var Location = function(data) {
+
+	/**  Setup the markers using the passed in data*/
+	this.marker = new google.maps.Marker({
+		title: data.title,
+		position: data.latLng,
+		address: data.address,
+		url: data.url,
+		icon: data.iconImage,
+		draggable: false,
+		Animation: google.maps.Animation.DROP,
+		visible: true,
+		highlight: ko.observable(false),
+	});
+
+    /** setup a new infoWindow for each location. */
+    this.infoWindow = new google.maps.InfoWindow({maxWidth: 300});
+};
+
+/** 
+	* This method will toggle anaimation bounce and highlight the list item that is selected.
+	* @constructor
+*/
+Location.prototype.toggleLoc = function () {
+		if (this.marker.getAnimation() == null) {
+			this.marker.setAnimation(google.maps.Animation.BOUNCE);
+			this.marker.highlight(true);
+		} else {
+			this.marker.setAnimation(null);
+			this.marker.highlight(false);
+		};
+		this.infoWindow.open();
+};
+
+/** 
+	* This method will stop the bouncing, close the infoWindow and clear the wiki information 
+	* @constructor
+*/
+Location.prototype.stopLoc = function() {
+	this.marker.setAnimation(null);
+	this.marker.highlight(false);
+	this.infoWindow.close();
+    $wikiElem.html("");
+};
+
+/**
+	* this method pulls in information from wikipedia using the loaction
+	* @constructor
+*/
+Location.prototype.getWiki = function () {
+    
+    /** load wikipedia data using this URL */
+    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&amp;search=' + this.marker.title + '&amp;format=json&amp;callback=wikiCallback';
+    
+    /** set the time out duration and message */
+    var wikiRequestTimeout = setTimeout(function(){
+        $wikiElem.text("failed to get wikipedia resources");
+    }, 8000);
+
+    $.ajax({
+        url: wikiUrl,
+        dataType: "jsonp",
+        jsonp: "callback",
+        success: function( response ) {
+            var articleList = response[1];
+            var wikiHtml = "";
+            if (articleList.length &lt;= 0 ) {
+            	wikiHtml = "No wikipedia information available";
+            } else {
+	            for (var i = 0; i &lt; articleList.length; i++) {
+	                articleStr = articleList[i];
+	                var url = 'http://en.wikipedia.org/wiki/' + articleStr;
+	                wikiHtml = wikiHtml + '&lt;li>&lt;a href="' + url + '">' + articleStr + '&lt;/a>&lt;/li>';
+	            };
+	        };
+            $wikiElem.html(wikiHtml);
+            clearTimeout(wikiRequestTimeout);
+        }
+    });
+};
+		
+var Model = {
+	miltonCenter: {lat: 33.931375, lng: -84.381658},
+	markers: [
+	    {
+	      	title: 'Coca Cola',
+			latLng: {lat: 33.771126, lng: -84.396454},
+			address: '606-608 Luckie St NW&lt;br>Atlanta, GA 30313',
+			url: 'https://www.worldofcoca-cola.com/',
+			iconImage: 'img/cola.jpg',
+			visible: true,
+			highlight: ko.observable(false)
+		},
+		{
+			title: 'AMC',
+			latLng: {lat: 34.048134, lng: -84.296139},
+			address:'North Point Mall, 4500 North Point Cir, Alpharetta, GA 30022',
+			url: 'https://www.amctheatres.com/movie-theatres/atlanta/amc-north-point-mall-12',
+			iconImage: 'img/movie.jpg',
+			visible: true,
+			highlight: ko.observable(false)
+		},
+		{
+			title:	'Turner Field',
+			latLng: {lat: 33.735067, lng: -84.38999433}, 
+			address: '755 Hank Aaron Dr SE&lt;br>Atlanta, GA 30315',
+			url: 'http://atlanta.braves.mlb.com/atl/ballpark/',
+			iconImage: 'img/baseball.png',
+			visible: true,
+			highlight: ko.observable(false)
+		},
+		{
+			title:	'Georgia Aquarium',
+			latLng: {lat: 33.763627, lng: -84.395121},
+			address: '225 Baker St NW&lt;br>Atlanta, GA 30313',
+			url: 'http://www.georgiaaquarium.org/',
+			iconImage: 'img/fish.png',
+			visible: true,
+			highlight: ko.observable(false)
+		},
+		{
+			title:	'Six Flags Over Georgia',
+			latLng: {lat: 33.768570, lng: -84.550910},
+			address: '275 Riverside Pkwy&lt;br>Austell, GA 30168',
+			url: 'https://www.sixflags.com/overgeorgia',
+			iconImage: 'img/rollercoaster.png',
+			visible: true,
+			highlight: ko.observable(false)
+		},
+		{	
+			title:	'Lake Lanier Islands',
+			latLng: {lat: 34.177871, lng: -84.030111},
+			address: '7000 LANIER ISLANDS PARKWAY&lt;br>BUFORD, GA 30518',
+			url: 'http://www.lanierislands.com/',
+			iconImage: 'img/waterski.jpg',
+			visible: true,
+			highlight: ko.observable(false)
+		},
+		{
+			title: 'The Georgia Dome',
+			latLng: {lat: 33.757694, lng: -84.400625},
+			address: '1 Georgia Dome Dr.&lt;br>Atlanta, GA 30313',
+			url: 'http://www.gadome.com/',
+			iconImage: 'img/football.jpg',
+			visible: true,
+			highlight: ko.observable(false)
+		},
+		{
+			title: 'Echelon Golf Club',
+			latLng: {lat: 34.197036, lng: -84.286404},
+			address: '201 Traditions Dr.&lt;br>Alpharetta, GA 30004',
+			url: 'http://www.echelongolf.com/',
+			iconImage: 'img/golf.png',
+			visible: true,
+			highlight: ko.observable(false)
+		},
+		{
+			title: "Hawk's Ridge Golf Club",
+			latLng: {lat: 34.258384, lng: -84.281266},
+			address: '1100 Hawks Ridge Golf Club&lt;br>Ball Ground, GA 30107',
+			url: 'http://www.hawksridge.com/',
+			iconImage: 'img/golf.png',
+			visible: true,
+			highlight: ko.observable(false)
+		},
+		{
+			title: 'In Your Dreams Farm',
+			latLng: {lat: 34.200007, lng: -84.311100},
+			address: '17875 Birmingham Hwy&lt;br>Alpharetta, GA 30004',
+			url: 'https://www.facebook.com/In-Your-Dreams-Farm-325164227564058/',
+			iconImage: 'img/horse.png',
+			visible: true,
+			highlight: ko.observable(false)
+		}
+	]
+};
+
+/** 
+	* viewModel performs all the setup and processing required to connect the Model and the View
+*/
+var viewModel = function () {
+	var self = this; 
+	var map; // the google map object
+	var lastLocItem = null; //used to store the last clicked location
+	self.placeList = ko.observableArray([]); // list of location objects.
+	self.searchString = ko.observable(''); // the filter text entered by the user
+
+	/**
+		* Populate the ko placeList observable array, 
+		* for each item in the Model array create new locattion object in the placeList array.
+	*/
+	Model.markers.forEach(function(myMarker) {
+		self.placeList.push(new Location(myMarker));
+	});
+
+	/** render the inital map */
+  	map = new google.maps.Map(document.getElementById('map-container'), {
+    		center: Model.miltonCenter,
+    		zoom: 10
+	});
+
+	/** for each Location setup the markers and the infoWindow */
+	self.placeList().forEach(function(locItem){
+
+		/** drop the marker */
+		locItem.marker.setMap(map);
+
+		/** add the click event to the marker */
+		locItem.marker.addListener('click', function () {
+			if (lastLocItem !== null) {
+				lastLocItem.stopLoc(); /** stop the last clicked one */
+				lastLocItem.infoWindow.close() /** close the last infoWindow */
+			};
+			locItem.toggleLoc(); /** togole the current clikced one */
+			locItem.infoWindow.open(map, locItem.marker);
+			locItem.getWiki();			
+			
+			lastLocItem = locItem; /** store the current into last */
+			map.panTo(locItem.marker.position);
+			locItem.marker.setMap(map);
+		});
+
+		/** load the infoWindow Content */
+		var contentString = '&lt;h3>' + locItem.marker.title + '&lt;/h3>' + locItem.marker.address + '&lt;br>' + '&lt;a href="' + locItem.marker.url + '">' + locItem.marker.url + '&lt;/a>';
+	  	locItem.infoWindow.setContent(contentString);
+
+	  	/** add an event to stop the animation if user closes the infoWindow */
+	  	locItem.infoWindow.addListener('closeclick', function (){
+	  			locItem.stopLoc(); /** stop the icon bounce */
+	  	});
+	});
+
+	/** called when the one of the list items is clicked */
+	self.toggleBounce = function (locItem) {
+		if (lastLocItem !== null) {
+			lastLocItem.stopLoc();
+			locItem.infoWindow.close();
+		};
+		locItem.toggleLoc();
+		locItem.infoWindow.open(map, locItem.marker);
+		locItem.getWiki();
+		lastLocItem = locItem;
+
+		/** pan to the clicked marker */
+		map.panTo(locItem.marker.position);
+		locItem.marker.setMap(map);
+  	};
+  	
+  	/** this fucntion will update the visible property of the searchList based on the searchString  */
+    self.processFilter = function(){
+		self.placeList().forEach(function(locItem){
+			/** The visible property of the marker will set if the marker will display.  */
+			if (self.searchString() == '' || locItem.marker.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
+				locItem.marker.setVisible(true);
+			} else {
+				locItem.marker.setVisible(false);
+			}
+		});
+
+		/** trigger a change to the placeList array so it will display on the screen */
+		var tempList = ko.observableArray(self.placeList());
+		self.placeList([]);
+		for (var x=0; x &lt; tempList().length; x++){
+		    self.placeList.push(tempList()[x]);
+		};
+	};
+}
+ko.applyBindings(new viewModel());</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Location.html">Location</a></li><li><a href="Location_getWiki.html">getWiki</a></li><li><a href="Location_stopLoc.html">stopLoc</a></li><li><a href="Location_toggleLoc.html">toggleLoc</a></li></ul><h3>Global</h3><ul><li><a href="global.html#$wikiElem">$wikiElem</a></li><li><a href="global.html#viewModel">viewModel</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Sun Feb 28 2016 17:10:33 GMT-0500 (Eastern Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
