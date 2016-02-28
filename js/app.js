@@ -44,6 +44,7 @@ Location.prototype.stopLoc = function() {
 	this.marker.setAnimation(null);
 	this.marker.highlight(false);
 	this.infoWindow.close();
+    $wikiElem.html("");
 };
 
 //this method pulls in information from wikipedia using the loaction
@@ -73,7 +74,6 @@ Location.prototype.getWiki = function () {
 	                wikiHtml = wikiHtml + '<li><a href="' + url + '">' + articleStr + '</a></li>';
 	            };
 	        };
-            console.log(wikiHtml);
             $wikiElem.html(wikiHtml);
             clearTimeout(wikiRequestTimeout);
         }
@@ -219,6 +219,11 @@ var viewModel = function () {
 		// load the inforWindow Content
 		var contentString = '<h3>' + locItem.marker.title + '</h3>' + locItem.marker.address + '<br>' + '<a href="' + locItem.marker.url + '">' + locItem.marker.url + '</a>';
 	  	locItem.infoWindow.setContent(contentString);
+
+	  	//add an event to stop the animation if user closes the infoWindow
+	  	locItem.infoWindow.addListener('closeclick', function (){
+	  			locItem.stopLoc(); //stop the icon bounce
+	  	});
 	});
 
 	//called when the one of the list items is clicked
