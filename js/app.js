@@ -63,11 +63,18 @@ Location.prototype.getWiki = function () {
         jsonp: "callback",
         success: function( response ) {
             var articleList = response[1];
-            for (var i = 0; i < articleList.length; i++) {
-                articleStr = articleList[i];
-                var url = 'http://en.wikipedia.org/wiki/' + articleStr;
-                $wikiElem.prepend('<li><a href="' + url + '">' + articleStr + '</a></li>');
-            };
+            var wikiHtml = "";
+            if (articleList.length <= 0 ) {
+            	wikiHtml = "No wikipedia information available";
+            } else {
+	            for (var i = 0; i < articleList.length; i++) {
+	                articleStr = articleList[i];
+	                var url = 'http://en.wikipedia.org/wiki/' + articleStr;
+	                wikiHtml = wikiHtml + '<li><a href="' + url + '">' + articleStr + '</a></li>';
+	            };
+	        };
+            console.log(wikiHtml);
+            $wikiElem.html(wikiHtml);
             clearTimeout(wikiRequestTimeout);
         }
     });
@@ -202,7 +209,7 @@ var viewModel = function () {
 			};
 			locItem.toggleLoc(); // togole the current clikced one
 			locItem.infoWindow.open(map, locItem.marker);
-			//TODO locItem.getWiki();			
+			locItem.getWiki();			
 			
 			lastLocItem = locItem; // store the current into last
 			map.panTo(locItem.marker.position);
@@ -222,6 +229,7 @@ var viewModel = function () {
 		};
 		locItem.toggleLoc();
 		locItem.infoWindow.open(map, locItem.marker);
+		locItem.getWiki();
 		lastLocItem = locItem;
 
 		//pan to the clicked marker
