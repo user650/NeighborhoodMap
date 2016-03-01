@@ -282,4 +282,23 @@ var viewModel = function () {
 		};
 	};
 }
-ko.applyBindings(new viewModel());
+
+/**
+	* Get the Google Maps script!
+*/
+/** this verion with the key no longer worked when I switched to using JQuery */
+/** var url = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDnMDCU1lhdz0OgwyTipn9-euoPe9aOiEY?callback=goodCall'; */
+var url = 'https://maps.googleapis.com/maps/api/js?callback=goodCall';
+$.getScript(url)
+/** if getting the script is successful */
+  .done(function() {
+    console.log('Loaded the Google Maps sucessfully!!');
+  })
+/** if getting the script fails */
+  .fail(function() {
+    console.log('So sorry, Google maps did not laod correctly.');
+    alert('So sorry, Google maps did not laod correctly.');
+  });
+var goodCall = function () {
+	ko.applyBindings(new viewModel());
+}
