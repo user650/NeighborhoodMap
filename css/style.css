@@ -43,7 +43,8 @@ h1 {
   margin-right: 30px;
 }
 .wikipedia-container {
-  //visibility: hidden;
+  font-size: 15px;
+  padding: 0 0 0 4px;
 }
 .hide {
   display:none;

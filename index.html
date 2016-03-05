@@ -24,14 +24,14 @@
                     </div>
                     <div class="row list">
                         <ul data-bind="foreach: placeList">
-                            <li data-bind="visible: marker.visible, text: marker.title, click: $parent.toggleBounce, css: {'selected': marker.highlight()}"</li>
+                            <li data-bind="visible: marker.visible, text: marker.title, click: $parent.toggleBounce, css: {'selected': marker.highlight()}"></li>
                         </ul>
-                    </div>
-                    <div class="row">
-                            <div class="wikipedia-container">
-                                <h3 id="wikipedia-header">Relevant Wikipedia Links</h3>
-                                <ul id="wikipedia-links"></ul>
-                            </div>
+                        <div class="wikipedia-container">
+                            <h3 id="wikipedia-header">Relevant Wikipedia Links</h3>
+                            <ul data-bind="foreach: wikiItem">
+                                <li data-bind="html: $data"></li>
+                            </ul>
+                        </div>
                     </div>
             </div>
             <div class="col-md-9 text-center">

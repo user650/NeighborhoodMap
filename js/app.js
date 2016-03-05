@@ -6,9 +6,8 @@
 
 /** 
    Resubmission 2/28/2016 - ss made several addtional updates to change this is object orented per recommendation from instructor
+   Resubmission 3/5/2016 - ss Changed the wiki links section to use the observable array 
 */
-
-var $wikiElem = $('#wikipedia-links');
 
 /** 
 	* Represents a location object which includes a merker and an infoWindow.
@@ -57,45 +56,13 @@ Location.prototype.stopLoc = function() {
 	this.marker.setAnimation(null);
 	this.marker.highlight(false);
 	this.infoWindow.close();
-    $wikiElem.html("");
 };
 
 /**
 	* this method pulls in information from wikipedia using the loaction
 	* @constructor
 */
-Location.prototype.getWiki = function () {
-    
-    /** load wikipedia data using this URL */
-    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + this.marker.title + '&format=json&callback=wikiCallback';
-    
-    /** set the time out duration and message */
-    var wikiRequestTimeout = setTimeout(function(){
-        $wikiElem.text("failed to get wikipedia resources");
-    }, 8000);
 
-    $.ajax({
-        url: wikiUrl,
-        dataType: "jsonp",
-        jsonp: "callback",
-        success: function( response ) {
-            var articleList = response[1];
-            var wikiHtml = "";
-            if (articleList.length <= 0 ) {
-            	wikiHtml = "No wikipedia information available";
-            } else {
-	            for (var i = 0; i < articleList.length; i++) {
-	                articleStr = articleList[i];
-	                var url = 'http://en.wikipedia.org/wiki/' + articleStr;
-	                wikiHtml = wikiHtml + '<li><a href="' + url + '">' + articleStr + '</a></li>';
-	            };
-	        };
-            $wikiElem.html(wikiHtml);
-            clearTimeout(wikiRequestTimeout);
-        }
-    });
-};
-		
 var Model = {
 	miltonCenter: {lat: 33.931375, lng: -84.381658},
 	markers: [
@@ -194,6 +161,7 @@ var Model = {
 
 /** 
 	* viewModel performs all the setup and processing required to connect the Model and the View
+	@constructor
 */
 var viewModel = function () {
 	var self = this; 
@@ -201,6 +169,7 @@ var viewModel = function () {
 	var lastLocItem = null; //used to store the last clicked location
 	self.placeList = ko.observableArray([]); // list of location objects.
 	self.searchString = ko.observable(''); // the filter text entered by the user
+    self.wikiItem = ko.observableArray([]);
 
 	/**
 		* Populate the ko placeList observable array, 
@@ -226,6 +195,7 @@ var viewModel = function () {
 		locItem.marker.addListener('click', function () {
 			if (lastLocItem !== null) {
 				lastLocItem.stopLoc(); /** stop the last clicked one */
+				self.wikiItem.removeAll();
 				lastLocItem.infoWindow.close() /** close the last infoWindow */
 			};
 			locItem.toggleLoc(); /** togole the current clikced one */
@@ -244,6 +214,7 @@ var viewModel = function () {
 	  	/** add an event to stop the animation if user closes the infoWindow */
 	  	locItem.infoWindow.addListener('closeclick', function (){
 	  			locItem.stopLoc(); /** stop the icon bounce */
+  				self.wikiItem.removeAll();
 	  	});
 	});
 
@@ -251,11 +222,12 @@ var viewModel = function () {
 	self.toggleBounce = function (locItem) {
 		if (lastLocItem !== null) {
 			lastLocItem.stopLoc();
+			self.wikiItem.removeAll();
 			locItem.infoWindow.close();
 		};
 		locItem.toggleLoc();
 		locItem.infoWindow.open(map, locItem.marker);
-		locItem.getWiki();
+		getWiki(locItem);
 		lastLocItem = locItem;
 
 		/** pan to the clicked marker */
@@ -281,7 +253,46 @@ var viewModel = function () {
 		    self.placeList.push(tempList()[x]);
 		};
 	};
+	
+	
+/** 
+	* getWiki pulls in valid wikiPedia links based on the title information.
+	@function
+	@param {locItem} a location item is passed in and the marker title is used to search for valid wikipedia information
+*/
+	function getWiki (locItem) {
+	    /** clear out the array of wiki links */
+	    self.wikiItem.removeAll();
+	    /** load wikipedia data using this URL */
+	    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + locItem.marker.title + '&format=json&callback=wikiCallback';
+	    /** set the time out duration and message */
+	    var wikiRequestTimeout = setTimeout(function(){
+	        self.wikiItem[0]("failed to get wikipedia resources");
+	    }, 8000);
+	    $.ajax({
+	        url: wikiUrl,
+	        dataType: "jsonp",
+	        jsonp: "callback",
+	        success: function( response ) {
+	            var articleList = response[1];
+	            var wikiHtml = "";
+	            var wikiHtmlOLD = "";
+	            if (articleList.length <= 0 ) {
+	            	wikiHtml = "No wikipedia information available";
+	            } else {
+		            for (var i = 0; i < articleList.length; i++) {
+		                articleStr = articleList[i];
+		                var link = 'http://en.wikipedia.org/wiki/' + articleStr;
+		                wikiHtml = '<a href="' + link + '">' + articleStr + '</a>';
+					    self.wikiItem.push(wikiHtml);
+		            };
+		        };
+	            clearTimeout(wikiRequestTimeout);
+	        }
+	    });
+	};
 }
+
 
 /**
 	* Get the Google Maps script!
