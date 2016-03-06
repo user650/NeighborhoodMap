@@ -6,12 +6,11 @@
 
 /** 
    Resubmission 2/28/2016 - ss made several addtional updates to change this is object orented per recommendation from instructor
-   Resubmission 3/5/2016 - ss Changed the wiki links section to use the observable array 
+   Resubmission 3/5/2016  - ss Changed the wiki links section to use the observable array 
 */
 
 /** 
-	* Represents a location object which includes a merker and an infoWindow.
-	* @constructor
+	* @constructor Represents a location object which includes a merker and an infoWindow.
 	* @param {marker} - goggle marker data used to build the marker portion of the object 
 */
 var Location = function(data) {
@@ -34,22 +33,22 @@ var Location = function(data) {
 };
 
 /** 
-	* This method will toggle anaimation bounce and highlight the list item that is selected.
+	* @desc This method will toggle anaimation bounce and highlight the list item that is selected.
 	* @constructor
 */
 Location.prototype.toggleLoc = function () {
-		if (this.marker.getAnimation() == null) {
+		if (this.marker.getAnimation() === null) {
 			this.marker.setAnimation(google.maps.Animation.BOUNCE);
 			this.marker.highlight(true);
 		} else {
 			this.marker.setAnimation(null);
 			this.marker.highlight(false);
-		};
+		}
 		this.infoWindow.open();
 };
 
 /** 
-	* This method will stop the bouncing, close the infoWindow and clear the wiki information 
+	* @desc This method will stop the bouncing, close the infoWindow and clear the wiki information 
 	* @constructor
 */
 Location.prototype.stopLoc = function() {
@@ -59,7 +58,7 @@ Location.prototype.stopLoc = function() {
 };
 
 /**
-	* this method pulls in information from wikipedia using the loaction
+	* @desc this method pulls in information from wikipedia using the loaction
 	* @constructor
 */
 
@@ -160,8 +159,7 @@ var Model = {
 };
 
 /** 
-	* viewModel performs all the setup and processing required to connect the Model and the View
-	@constructor
+	* @constructor viewModel performs all the setup and processing required to connect the Model and the View
 */
 var viewModel = function () {
 	var self = this; 
@@ -196,8 +194,8 @@ var viewModel = function () {
 			if (lastLocItem !== null) {
 				lastLocItem.stopLoc(); /** stop the last clicked one */
 				self.wikiItem.removeAll();
-				lastLocItem.infoWindow.close() /** close the last infoWindow */
-			};
+				lastLocItem.infoWindow.close(); /** close the last infoWindow */
+			}
 			locItem.toggleLoc(); /** togole the current clikced one */
 			locItem.infoWindow.open(map, locItem.marker);
 			getWiki(locItem);			
@@ -218,13 +216,17 @@ var viewModel = function () {
 	  	});
 	});
 
-	/** called when the one of the list items is clicked */
+	/** 
+		* @desc called when the one of the list items is clicked
+		* it will toggle the animation, infoWindow and wiki information.
+		* @param {locItem} the location item that is  
+	*/
 	self.toggleBounce = function (locItem) {
 		if (lastLocItem !== null) {
 			lastLocItem.stopLoc();
 			self.wikiItem.removeAll();
 			locItem.infoWindow.close();
-		};
+		}
 		locItem.toggleLoc();
 		locItem.infoWindow.open(map, locItem.marker);
 		getWiki(locItem);
@@ -239,7 +241,7 @@ var viewModel = function () {
     self.processFilter = function(){
 		self.placeList().forEach(function(locItem){
 			/** The visible property of the marker will set if the marker will display.  */
-			if (self.searchString() == '' || locItem.marker.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
+			if (self.searchString() === '' || locItem.marker.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
 				locItem.marker.setVisible(true);
 			} else {
 				locItem.stopLoc();
@@ -255,14 +257,14 @@ var viewModel = function () {
 		self.placeList([]);
 		for (var x=0; x < tempList().length; x++){
 		    self.placeList.push(tempList()[x]);
-		};
+		}
 	};
 	
 	
 /** 
 	* getWiki pulls in valid wikiPedia links based on the title information.
-	@function
-	@param {locItem} a location item is passed in and the marker title is used to search for valid wikipedia information
+	* @function
+	* @param {locItem} a location item is passed in and the marker title is used to search for valid wikipedia information
 */
 	function getWiki (locItem) {
 	    /** clear out the array of wiki links */
@@ -289,19 +291,21 @@ var viewModel = function () {
 		                var link = 'http://en.wikipedia.org/wiki/' + articleStr;
 		                wikiHtml = '<a href="' + link + '">' + articleStr + '</a>';
 					    self.wikiItem.push(wikiHtml);
-		            };
-		        };
+		            }
+		        }
 	            clearTimeout(wikiRequestTimeout);
 	        }
 	    });
-	};
-}
+	}
+};
 
 
 /**
-	* Get the Google Maps script!
+	* @desc Get the Google Maps script!
+	* this will call the Google maps async using jquery.
 */
-/** this verion with the key no longer worked when I switched to using JQuery */
+
+/** this verion with the API does not seem to work when called here with JQuery.  But that's ok.  I dont need the key.
 /** var url = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDnMDCU1lhdz0OgwyTipn9-euoPe9aOiEY?callback=goodCall'; */
 var url = 'https://maps.googleapis.com/maps/api/js?callback=goodCall';
 $.getScript(url)
@@ -316,4 +320,4 @@ $.getScript(url)
   });
 var goodCall = function () {
 	ko.applyBindings(new viewModel());
-}
+};
