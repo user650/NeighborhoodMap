@@ -14,9 +14,9 @@ li {
   display: block;
   text-decoration: none;
   color: #000000;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   line-height: 30px;
-  border-bottom: solid 1px #CCCCCC;
+  border-bottom: solid 1px #cccccc;
   padding: 0 0 0 5px;
   cursor: pointer;
 }
@@ -26,18 +26,18 @@ li {
     z-index: 1;
 }
 .selected, li:hover {
-  color: #FFFFFF;
-  background-color: #58453E;
+  color: #ffffff;
+  background-color: #58453e;
 }
 .li:hover {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 h1 {
-  background-color: #58453E;
+  background-color: #58453e;
   font-family: 'Belleza', sans-serif;
   letter-spacing:.02em; */
   font-size: 30px;
-  color: #EEF7FF;
+  color: #eef7ff;
   padding-top: 10px;
   padding-bottom: 10px;
   margin-right: 30px;
