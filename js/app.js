@@ -200,7 +200,7 @@ var viewModel = function () {
 			};
 			locItem.toggleLoc(); /** togole the current clikced one */
 			locItem.infoWindow.open(map, locItem.marker);
-			locItem.getWiki();			
+			getWiki(locItem);			
 			
 			lastLocItem = locItem; /** store the current into last */
 			map.panTo(locItem.marker.position);
@@ -242,7 +242,11 @@ var viewModel = function () {
 			if (self.searchString() == '' || locItem.marker.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
 				locItem.marker.setVisible(true);
 			} else {
+				locItem.stopLoc();
 				locItem.marker.setVisible(false);
+				if (locItem == lastLocItem) {
+					self.wikiItem.removeAll();
+				}
 			}
 		});
 
