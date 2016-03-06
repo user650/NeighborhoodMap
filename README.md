@@ -20,6 +20,9 @@ causes both the list and corresponding icons to be filtered.  By default if the 
 # RECENT UPDATES:
 Since the original submission I have made the following changes 
 
+## THIRD revision:
+- per the third review there are issues with the JQUERY that need to be resolved.
+
 ## SECOND revision:
 - changed the Google map call to use asynchronous  via JQUERY.  I moved this call from the HTML to the app.js script and used the callback to launch the main call to initialize ko variables.
 -  changed the Wikipedia search information to display on the screen based on the knockout framework instead of jquery markup.   This required adjustment / moving the function to the view model rather than a location object method. 
