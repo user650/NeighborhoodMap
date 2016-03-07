@@ -301,23 +301,18 @@ var viewModel = function () {
 
 
 /**
-	* @desc Get the Google Maps script!
-	* this will call the Google maps async using jquery.
+	* @desc These functions will launch depending on the sucessful completion of the Google Maps API call embedded in
+	*       the HTML document. 
 */
 
-/** this verion with the API does not seem to work when called here with JQuery.  But that's ok.  I dont need the key.
-/** var url = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDnMDCU1lhdz0OgwyTipn9-euoPe9aOiEY?callback=goodCall'; */
-var url = 'https://maps.googleapis.com/maps/api/js?callback=goodCall';
-$.getScript(url)
-/** if getting the script is successful */
-  .done(function() {
-    console.log('Loaded the Google Maps sucessfully!!');
-  })
-/** if getting the script fails */
-  .fail(function() {
-    console.log('So sorry, Google maps did not laod correctly.');
-    alert('So sorry, Google maps did not laod correctly.');
-  });
+/** if the good map API is unsuccessful then send a message to the screen and the colsole  */
+var badCall = function () {
+  console.log('So sorry, Google maps did not laod correctly.');
+  alert('So sorry, Google maps did not laod correctly.');
+}
+
+/** if the google map call is sucessful then launch the view model **/
 var goodCall = function () {
+	console.log('Googgle maps call was successful');
 	ko.applyBindings(new viewModel());
 };
