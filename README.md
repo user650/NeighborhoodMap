@@ -21,7 +21,9 @@ causes both the list and corresponding icons to be filtered.  By default if the 
 Since the original submission I have made the following changes 
 
 ## THIRD revision:
-- per the third review there are issues with the JQUERY that need to be resolved.
+- moved the googlemap async call back to HTML and used onerror to display an error alert when the call us unsuccessful
+- updated the JSDoc based on new version of the app.js.
+- inserted the newer verson of JQuery
 
 ## SECOND revision:
 - changed the Google map call to use asynchronous  via JQUERY.  I moved this call from the HTML to the app.js script and used the callback to launch the main call to initialize ko variables.
