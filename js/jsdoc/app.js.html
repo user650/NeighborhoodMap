@@ -34,13 +34,11 @@
 
 /** 
    Resubmission 2/28/2016 - ss made several addtional updates to change this is object orented per recommendation from instructor
+   Resubmission 3/5/2016  - ss Changed the wiki links section to use the observable array 
 */
 
-var $wikiElem = $('#wikipedia-links');
-
 /** 
-	* Represents a location object which includes a merker and an infoWindow.
-	* @constructor
+	* @constructor Represents a location object which includes a merker and an infoWindow.
 	* @param {marker} - goggle marker data used to build the marker portion of the object 
 */
 var Location = function(data) {
@@ -63,67 +61,35 @@ var Location = function(data) {
 };
 
 /** 
-	* This method will toggle anaimation bounce and highlight the list item that is selected.
+	* @desc This method will toggle anaimation bounce and highlight the list item that is selected.
 	* @constructor
 */
 Location.prototype.toggleLoc = function () {
-		if (this.marker.getAnimation() == null) {
+		if (this.marker.getAnimation() === null) {
 			this.marker.setAnimation(google.maps.Animation.BOUNCE);
 			this.marker.highlight(true);
 		} else {
 			this.marker.setAnimation(null);
 			this.marker.highlight(false);
-		};
+		}
 		this.infoWindow.open();
 };
 
 /** 
-	* This method will stop the bouncing, close the infoWindow and clear the wiki information 
+	* @desc This method will stop the bouncing, close the infoWindow and clear the wiki information 
 	* @constructor
 */
 Location.prototype.stopLoc = function() {
 	this.marker.setAnimation(null);
 	this.marker.highlight(false);
 	this.infoWindow.close();
-    $wikiElem.html("");
 };
 
 /**
-	* this method pulls in information from wikipedia using the loaction
+	* @desc this method pulls in information from wikipedia using the loaction
 	* @constructor
 */
-Location.prototype.getWiki = function () {
-    
-    /** load wikipedia data using this URL */
-    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&amp;search=' + this.marker.title + '&amp;format=json&amp;callback=wikiCallback';
-    
-    /** set the time out duration and message */
-    var wikiRequestTimeout = setTimeout(function(){
-        $wikiElem.text("failed to get wikipedia resources");
-    }, 8000);
 
-    $.ajax({
-        url: wikiUrl,
-        dataType: "jsonp",
-        jsonp: "callback",
-        success: function( response ) {
-            var articleList = response[1];
-            var wikiHtml = "";
-            if (articleList.length &lt;= 0 ) {
-            	wikiHtml = "No wikipedia information available";
-            } else {
-	            for (var i = 0; i &lt; articleList.length; i++) {
-	                articleStr = articleList[i];
-	                var url = 'http://en.wikipedia.org/wiki/' + articleStr;
-	                wikiHtml = wikiHtml + '&lt;li>&lt;a href="' + url + '">' + articleStr + '&lt;/a>&lt;/li>';
-	            };
-	        };
-            $wikiElem.html(wikiHtml);
-            clearTimeout(wikiRequestTimeout);
-        }
-    });
-};
-		
 var Model = {
 	miltonCenter: {lat: 33.931375, lng: -84.381658},
 	markers: [
@@ -221,7 +187,7 @@ var Model = {
 };
 
 /** 
-	* viewModel performs all the setup and processing required to connect the Model and the View
+	* @constructor viewModel performs all the setup and processing required to connect the Model and the View
 */
 var viewModel = function () {
 	var self = this; 
@@ -229,6 +195,7 @@ var viewModel = function () {
 	var lastLocItem = null; //used to store the last clicked location
 	self.placeList = ko.observableArray([]); // list of location objects.
 	self.searchString = ko.observable(''); // the filter text entered by the user
+    self.wikiItem = ko.observableArray([]);
 
 	/**
 		* Populate the ko placeList observable array, 
@@ -254,11 +221,12 @@ var viewModel = function () {
 		locItem.marker.addListener('click', function () {
 			if (lastLocItem !== null) {
 				lastLocItem.stopLoc(); /** stop the last clicked one */
-				lastLocItem.infoWindow.close() /** close the last infoWindow */
-			};
+				self.wikiItem.removeAll();
+				lastLocItem.infoWindow.close(); /** close the last infoWindow */
+			}
 			locItem.toggleLoc(); /** togole the current clikced one */
 			locItem.infoWindow.open(map, locItem.marker);
-			locItem.getWiki();			
+			getWiki(locItem);			
 			
 			lastLocItem = locItem; /** store the current into last */
 			map.panTo(locItem.marker.position);
@@ -272,18 +240,24 @@ var viewModel = function () {
 	  	/** add an event to stop the animation if user closes the infoWindow */
 	  	locItem.infoWindow.addListener('closeclick', function (){
 	  			locItem.stopLoc(); /** stop the icon bounce */
+  				self.wikiItem.removeAll();
 	  	});
 	});
 
-	/** called when the one of the list items is clicked */
+	/** 
+		* @desc called when the one of the list items is clicked
+		* it will toggle the animation, infoWindow and wiki information.
+		* @param {locItem} the location item that is  
+	*/
 	self.toggleBounce = function (locItem) {
 		if (lastLocItem !== null) {
 			lastLocItem.stopLoc();
+			self.wikiItem.removeAll();
 			locItem.infoWindow.close();
-		};
+		}
 		locItem.toggleLoc();
 		locItem.infoWindow.open(map, locItem.marker);
-		locItem.getWiki();
+		getWiki(locItem);
 		lastLocItem = locItem;
 
 		/** pan to the clicked marker */
@@ -295,10 +269,14 @@ var viewModel = function () {
     self.processFilter = function(){
 		self.placeList().forEach(function(locItem){
 			/** The visible property of the marker will set if the marker will display.  */
-			if (self.searchString() == '' || locItem.marker.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
+			if (self.searchString() === '' || locItem.marker.title.toLowerCase().indexOf(self.searchString().toLowerCase()) >= 0) {
 				locItem.marker.setVisible(true);
 			} else {
+				locItem.stopLoc();
 				locItem.marker.setVisible(false);
+				if (locItem == lastLocItem) {
+					self.wikiItem.removeAll();
+				}
 			}
 		});
 
@@ -307,10 +285,65 @@ var viewModel = function () {
 		self.placeList([]);
 		for (var x=0; x &lt; tempList().length; x++){
 		    self.placeList.push(tempList()[x]);
-		};
+		}
 	};
+	
+	
+/** 
+	* getWiki pulls in valid wikiPedia links based on the title information.
+	* @function
+	* @param {locItem} a location item is passed in and the marker title is used to search for valid wikipedia information
+*/
+	function getWiki (locItem) {
+	    /** clear out the array of wiki links */
+	    self.wikiItem.removeAll();
+	    /** load wikipedia data using this URL */
+	    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&amp;search=' + locItem.marker.title + '&amp;format=json&amp;callback=wikiCallback';
+	    /** set the time out duration and message */
+	    var wikiRequestTimeout = setTimeout(function(){
+	        self.wikiItem[0]("failed to get wikipedia resources");
+	    }, 8000);
+	    $.ajax({
+	        url: wikiUrl,
+	        dataType: "jsonp",
+	        jsonp: "callback",
+	        success: function( response ) {
+	            var articleList = response[1];
+	            var wikiHtml = "";
+	            var wikiHtmlOLD = "";
+	            if (articleList.length &lt;= 0 ) {
+	            	wikiHtml = "No wikipedia information available";
+	            } else {
+		            for (var i = 0; i &lt; articleList.length; i++) {
+		                articleStr = articleList[i];
+		                var link = 'http://en.wikipedia.org/wiki/' + articleStr;
+		                wikiHtml = '&lt;a href="' + link + '">' + articleStr + '&lt;/a>';
+					    self.wikiItem.push(wikiHtml);
+		            }
+		        }
+	            clearTimeout(wikiRequestTimeout);
+	        }
+	    });
+	}
+};
+
+
+/**
+	* @desc These functions will launch depending on the sucessful completion of the Google Maps API call embedded in
+	*       the HTML document. 
+*/
+
+/** if the good map API is unsuccessful then send a message to the screen and the colsole  */
+var badCall = function () {
+  console.log('So sorry, Google maps did not laod correctly.');
+  alert('So sorry, Google maps did not laod correctly.');
 }
-ko.applyBindings(new viewModel());</code></pre>
+
+/** if the google map call is sucessful then launch the view model **/
+var goodCall = function () {
+	console.log('Googgle maps call was successful');
+	ko.applyBindings(new viewModel());
+};</code></pre>
         </article>
     </section>
 
@@ -320,13 +353,13 @@ ko.applyBindings(new viewModel());</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Location.html">Location</a></li><li><a href="Location_getWiki.html">getWiki</a></li><li><a href="Location_stopLoc.html">stopLoc</a></li><li><a href="Location_toggleLoc.html">toggleLoc</a></li></ul><h3>Global</h3><ul><li><a href="global.html#$wikiElem">$wikiElem</a></li><li><a href="global.html#viewModel">viewModel</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Location_stopLoc.html">stopLoc</a></li><li><a href="Location_toggleLoc.html">toggleLoc</a></li><li><a href="Model.html">Model</a></li><li><a href="Represents%2520a%2520location%2520object%2520which%2520includes%2520a%2520merker%2520and%2520an%2520infoWindow..html">Represents a location object which includes a merker and an infoWindow.</a></li><li><a href="viewModel%2520performs%2520all%2520the%2520setup%2520and%2520processing%2520required%2520to%2520connect%2520the%2520Model%2520and%2520the%2520View.html">viewModel performs all the setup and processing required to connect the Model and the View</a></li></ul><h3>Global</h3><ul><li><a href="global.html#badCall">badCall</a></li><li><a href="global.html#goodCall">goodCall</a></li><li><a href="global.html#infoWindow">infoWindow</a></li><li><a href="global.html#marker">marker</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Sun Feb 28 2016 21:42:07 GMT-0500 (Eastern Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Sun Mar 06 2016 21:59:41 GMT-0500 (Eastern Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
